@@ -1,7 +1,6 @@
-//Criar cotação do dia 
-const USD = 4.87
-const EUR = 5.12
-const GBP = 6.08
+//CONSUMINDO API DE MOEDAS
+const url = 'https://economia.awesomeapi.com.br/last/'
+const coins = 'USD-BRL,EUR-BRL,BTC-BRL'
 
 
 
@@ -22,21 +21,41 @@ amount.addEventListener('input', (event) => {
 
 })
 
-//Capturando o submit 
-form.onsubmit = (event) => {
-    event.preventDefault()
+fetch(url + coins)
+    .then(function (response) {
+        return response.json()
 
-    switch (currency.value) {
-        case "USD":
-            convertCurrency(amount.value, USD, 'US$')
-            break
-        case "EUR":
-            convertCurrency(amount.value, EUR, '€')
-            break
-        case "GBP":
-            convertCurrency(amount.value, GBP, '£')
-    }
-}
+    })
+    .then((data) => {
+        console.log(data);
+        const USD = data.USDBRL.low
+        const USDDATE = new Date(data.USDBRL.create_date)
+        const EUR = data.EURBRL.low
+        const EURDATE = new Date(data.EURBRL.create_date)
+        const BTC = data.BTCBRL.low
+        const BTCDATE = new Date(data.BTCBRL.create_date
+        )
+        //Capturando o submit 
+        form.onsubmit = (event) => {
+            event.preventDefault()
+
+            switch (currency.value) {
+                case "USD":
+                    convertCurrency(amount.value, USD, 'US$', USDDATE.toLocaleString())
+                    break
+                case "EUR":
+                    convertCurrency(amount.value, EUR, '€', EURDATE.toLocaleString())
+                    break
+                case "BTC":
+                    convertCurrency(amount.value, BTC, '₿', BTCDATE.toLocaleString())
+            }
+        }
+
+    })
+
+
+
+
 
 //Formar valor no padrão de Moeda Brasileira
 function formatCurrencyBRL(value) {
@@ -48,11 +67,11 @@ function formatCurrencyBRL(value) {
 }
 
 //Função para convert a moeda
-function convertCurrency(amount, price, symbol) {
+function convertCurrency(amount, price, symbol, date) {
 
     try {
         let total = amount * price
-        description.textContent = `${symbol} 1 = ${formatCurrencyBRL(price)}`
+        description.textContent = `${symbol} 1 = ${formatCurrencyBRL(price)} em ${date}`
         result.textContent = `${formatCurrencyBRL(total).replace('R$', '')} Reais`
         footer.classList.add('show-result')
 
@@ -62,9 +81,4 @@ function convertCurrency(amount, price, symbol) {
         console.log(error);
         alert('Não foi possível converter, tente novamente mais tarde!')
     }
-
-
-
-
-
 }
